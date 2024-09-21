@@ -33,7 +33,7 @@ This command will generate a README.md file using the input files `input1.txt` a
 
 **Demo:**
 ------------
-![YouTube Video](https://www.youtube.com/embed/5jO_uVnIooE)
+[![YouTube Video](https://img.youtube.com/vi/5jO_uVnIooE/0.jpg)](https://www.youtube.com/embed/5jO_uVnIooE)
 
 **Troubleshooting:**
 -------------------
