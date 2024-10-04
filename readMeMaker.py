@@ -25,15 +25,14 @@ def load_config_file():
     return {}
 
 # Initializing Groq Client
-def initialize_groq_client(api_key=None):
-    # Uses default API key inside the .env file
-    if api_key is None:
-        api_key = os.getenv("GROQ_API_KEY")
+def initialize_groq_client(config):
+    # First try to get the API key from arguments, then from TOML config, then from environment
+    api_key = config.get('api_key') or os.getenv("GROQ_API_KEY")
     
-    # Error handler if no api key is specified in the .env file or by the user
+    # Error handler if no api key is specified anywhere
     if api_key is None:
-        raise ValueError("API key must be provided either directly or through the environment variable.")
-
+        raise ValueError("API key must be provided either through the environment variable or through the TOML config file in $HOME directory.")
+    
     return Groq(api_key=api_key)
 
 # Function to generate README content using Groq
@@ -76,7 +75,7 @@ def main():
     combined_input_content = "\n\n".join(input_contents)
 
     # Initialize Groq client
-    client = initialize_groq_client()
+    client = initialize_groq_client(config)
 
     # Generate README content
     readme_content = generate_readme(combined_input_content, client, args.model)
