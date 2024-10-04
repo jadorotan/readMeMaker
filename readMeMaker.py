@@ -1,4 +1,6 @@
 import os
+import sys
+import tomli
 from groq import Groq
 from argparse import ArgumentParser
 from dotenv import load_dotenv
@@ -6,9 +8,21 @@ from dotenv import load_dotenv
 # Tool Info
 TOOL_NAME = "ReadMeMaker"
 VERSION = "v0.1"
+DOTFILE_PATH = os.path.expanduser("~/.readmemakerconfig.toml")
 
 # Load environment variables from .env file
 load_dotenv()
+
+# Function to parse TOML config file
+def load_config_file():
+    if os.path.exists(DOTFILE_PATH):
+        try:
+            with open(DOTFILE_PATH, "rb") as f:
+                config = tomli.load(f)
+                return config
+        except tomli.TOMLDecodeError:
+            sys.exit("Error: Config file found, but it's not a valid TOML file.")
+    return {}
 
 # Initializing Groq Client
 def initialize_groq_client(api_key=None):
@@ -42,12 +56,15 @@ def generate_readme(input_content, client, user_model):
 
 # CLI Setup
 def main():
+    # Load config from the dotfile, if available
+    config = load_config_file()
+    
     # Set up argument parser
     parser = ArgumentParser(description="Generate a README.md file for the specified input files.")
     parser.add_argument("-i", "--input", nargs='+', required=True, help="The input files for which to generate a README.md.")
     parser.add_argument("-o", "--output", default=os.path.join(os.getcwd(), "README.md"), help="Specify the output file name and file path (default: Creates a README.md file in the same directory).")
     parser.add_argument("-v", "--version", action="version", version=f"{TOOL_NAME} {VERSION}", help="Show the version of the tool.")
-    parser.add_argument("-m", "--model", default="llama3-8b-8192", help="Specify the model to use (default: llama3-8b-8192).")
+    parser.add_argument("-m", "--model", default=config.get('model', 'llama3-8b-8192'), help="Specify the model to use (default: llama3-8b-8192).")
 
     # Parse arguments
     args = parser.parse_args()
