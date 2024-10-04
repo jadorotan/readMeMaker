@@ -1,2 +1,4 @@
+venv/
+output.md
 .env
 **/__pycache__/
